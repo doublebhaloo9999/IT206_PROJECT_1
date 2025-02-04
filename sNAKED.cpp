@@ -1,152 +1,206 @@
-#include <iostream>
-#include <conio.h>
+#include <bits/stdc++.h>
+#include <conio.h> // key press kbhit
 #include <windows.h>
+
 using namespace std;
-bool gameOver;
-const int width = 20;
-const int height = 20;
-int x, y, fruitX, fruitY, score;
-int tailX[100], tailY[100];
-int nTail;
-enum eDirecton { STOP = 0, LEFT, RIGHT, UP, DOWN};
-eDirecton dir;
-void Setup()
+
+#define MAX_LENGTH 1000
+
+// Directions
+const char DIR_UP = 'U';
+const char DIR_DOWN = 'D';
+const char DIR_LEFT = 'L';
+const char DIR_RIGHT = 'R';
+
+int consoleWidth, consoleHeight;
+
+void initScreen()
 {
-    gameOver = false;
-    dir = STOP;
-    x = width / 2;
-    y = height / 2;
-    fruitX = rand() % width;
-    fruitY = rand() % height;
-    score = 0;
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+    consoleHeight = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+    consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 }
-void Draw()
-{
-    system("cls"); //system("clear");
-    for (int i = 0; i < width+2; i++)
-        cout << "#";
-    cout << endl;
- 
-    for (int i = 0; i < height; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            if (j == 0)
-                cout << "#";
-            if (i == y && j == x)
-                cout << "O";
-            else if (i == fruitY && j == fruitX)
-                cout << "F";
-            else
-            {
-                bool print = false;
-                for (int k = 0; k < nTail; k++)
-                {
-                    if (tailX[k] == j && tailY[k] == i)
-                    {
-                        cout << "o";
-                        print = true;
-                    }
-                }
-                if (!print)
-                    cout << " ";
+
+struct Point {
+    int xCoord;
+    int yCoord;
+    Point() {}
+    Point(int x, int y) : xCoord(x), yCoord(y) {}
+};
+
+// Base Snake class
+class Snake {
+protected:
+    int length;
+    char direction;
+public:
+    Point body[MAX_LENGTH];
+    Snake(int x, int y) {
+        length = 1;
+        body[0] = Point(x, y);
+        direction = DIR_RIGHT;
+    }
+
+    virtual ~Snake() {} // Virtual destructor for polymorphism
+
+    int getLength() {
+        return length;
+    }
+
+    void changeDirection(char newDirection) {
+        if ((newDirection == DIR_UP && direction != DIR_DOWN) ||
+            (newDirection == DIR_DOWN && direction != DIR_UP) ||
+            (newDirection == DIR_LEFT && direction != DIR_RIGHT) ||
+            (newDirection == DIR_RIGHT && direction != DIR_LEFT)) {
+            direction = newDirection;
+        }
+    }
+
+    // Virtual function for movement - can be overridden by subclasses
+    virtual bool move(Point food) {
+        for (int i = length - 1; i > 0; i--) {
+            body[i] = body[i - 1];
+        }
+
+        switch (direction) {
+            case DIR_UP: body[0].yCoord--; break;
+            case DIR_DOWN: body[0].yCoord++; break;
+            case DIR_LEFT: body[0].xCoord--; break;
+            case DIR_RIGHT: body[0].xCoord++; break;
+        }
+
+        // Snake bites itself
+        for (int i = 1; i < length; i++) {
+            if (body[0].xCoord == body[i].xCoord && body[0].yCoord == body[i].yCoord) {
+                return false;
             }
-                 
- 
-            if (j == width - 1)
-                cout << "#";
         }
-        cout << endl;
+
+        // Snake eats food
+        if (food.xCoord == body[0].xCoord && food.yCoord == body[0].yCoord) {
+            body[length] = Point(body[length - 1].xCoord, body[length - 1].yCoord);
+            length++;
+        }
+
+        return true;
     }
- 
-    for (int i = 0; i < width+2; i++)
-        cout << "#";
-    cout << endl;
-    cout << "Score:" << score << endl;
-}
-void Input()
-{
-    if (_kbhit())
-    {
-        switch (_getch())
-        {
-        case 'a':
-            dir = LEFT;
-            break;
-        case 'd':
-            dir = RIGHT;
-            break;
-        case 'w':
-            dir = UP;
-            break;
-        case 's':
-            dir = DOWN;
-            break;
-        case 'x':
-            gameOver = true;
-            break;
+};
+
+
+class Board {
+    Snake *snake; // Polymorphic pointer for Snake or FastSnake
+    const char SNAKE_BODY = 'O';
+    Point food;
+    const char FOOD = 'o';
+    int score;
+
+public:
+    Board(Snake* s) : snake(s) { // Accept Snake pointer
+        spawnFood();
+        score = 0;
+    }
+
+    ~Board() {
+        delete snake; // Proper cleanup
+    }
+
+    int getScore() {
+        return score;
+    }
+
+    void spawnFood() {
+        int x = rand() % (consoleWidth - 1);
+        int y = rand() % (consoleHeight - 1);
+        food = Point(x, y);
+    }
+
+    void displayCurrentScore() {
+        gotoxy(consoleWidth / 2, 0);
+        cout << "Current Score : " << score;
+    }
+
+    void gotoxy(int x, int y) {
+        COORD coord;
+        coord.X = x;
+        coord.Y = y;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    }
+
+    void setColor(int color) {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+    }
+
+    void draw() {
+        system("cls");
+
+        // Draw Snake
+        setColor(2); // Green color for Snake
+        for (int i = 0; i < snake->getLength(); i++) {
+            gotoxy(snake->body[i].xCoord, snake->body[i].yCoord);
+            cout << SNAKE_BODY;
+        }
+
+        // Draw Food
+        setColor(4); // Red color for Food
+        gotoxy(food.xCoord, food.yCoord);
+        cout << FOOD;
+
+        // Reset color to default
+        setColor(7); 
+        displayCurrentScore();
+    }
+
+    bool update() {
+        bool isAlive = snake->move(food); // Polymorphic move call
+        if (!isAlive) {
+            return false;
+        }
+
+        if (food.xCoord == snake->body[0].xCoord && food.yCoord == snake->body[0].yCoord) {
+            score++;
+            spawnFood();
+        }
+        return true;
+    }
+
+    void getInput() {
+        if (kbhit()) {
+            int key = getch();
+            if (key == 'w' || key == 'W') {
+                snake->changeDirection(DIR_UP);
+            } else if (key == 'a' || key == 'A') {
+                snake->changeDirection(DIR_LEFT);
+            } else if (key == 's' || key == 'S') {
+                snake->changeDirection(DIR_DOWN);
+            } else if (key == 'd' || key == 'D') {
+                snake->changeDirection(DIR_RIGHT);
+            }
         }
     }
-}
-void Logic()
-{
-    int prevX = tailX[0];
-    int prevY = tailY[0];
-    int prev2X, prev2Y;
-    tailX[0] = x;
-    tailY[0] = y;
-    for (int i = 1; i < nTail; i++)
-    {
-        prev2X = tailX[i];
-        prev2Y = tailY[i];
-        tailX[i] = prevX;
-        tailY[i] = prevY;
-        prevX = prev2X;
-        prevY = prev2Y;
+};
+
+int main() {
+    srand(time(0));
+    initScreen();
+
+    // Polymorphism: Using base class pointer to handle both Snake and FastSnake
+    Snake* snake;
+    
+    snake = new Snake(10, 10); // Normal Snake
+    
+    Board* board = new Board(snake);
+
+    while (board->update()) {
+        board->getInput();
+        board->draw();
+        Sleep(100);
     }
-    switch (dir)
-    {
-    case LEFT:
-        x--;
-        break;
-    case RIGHT:
-        x++;
-        break;
-    case UP:
-        y--;
-        break;
-    case DOWN:
-        y++;
-        break;
-    default:
-        break;
-    }
-    if (x > width || x < 0 || y > height || y < 0)
-     gameOver = true;
-    // if (x >= width) x = 0; else if (x < 0) x = width - 1;
-    // if (y >= height) y = 0; else if (y < 0) y = height - 1;
- 
-    for (int i = 0; i < nTail; i++)
-        if (tailX[i] == x && tailY[i] == y)
-            gameOver = true;
- 
-    if (x == fruitX && y == fruitY)
-    {
-        score += 10;
-        fruitX = rand() % width;
-        fruitY = rand() % height;
-        nTail++;
-    }
-}
-int main()
-{
-    Setup();
-    while (!gameOver)
-    {
-        Draw();
-        Input();
-        Logic();
-        Sleep(10); //sleep(10);
-    }
+
+    cout << "Game over" << endl;
+    cout << "Final score is: " << board->getScore() << endl;
+
+    delete board; // Clean up
     return 0;
 }

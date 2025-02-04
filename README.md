@@ -1,10 +1,9 @@
 # IT206_PROJECT1
-# IT206_PROJECT1
 
-## Ksnake.cpp
+## sNAKED.cpp
 
 ### Overview
-`Ksnake.cpp` is a C++ implementation of the classic Snake game. The game is played in the console and features different difficulty levels, a scoring system, and a game-over condition when the snake collides with itself or the borders.
+`sNAKED.cpp` is a C++ implementation of the classic Snake game. The game is played in the console and features different difficulty levels, a scoring system, and a game-over condition when the snake collides with itself or the borders.
 
 ### Features
 - **Snake Movement**: The snake can move in four directions (up, down, left, right) using the keyboard.
@@ -29,6 +28,6 @@
   - `Board`: Manages the game board, including the snake, food, score, and game logic.
 
 ### How to Play
-1. **Compile the Code**: Use a C++ compiler to compile `Ksnake.cpp`.
+1. **Compile the Code**: Use a C++ compiler to compile `sNAKED.cpp`.
    ```sh
-   g++ Ksnake.cpp -o Ksnake.exe
+   g++ sNAKED.cpp -o sNAKED.exe
