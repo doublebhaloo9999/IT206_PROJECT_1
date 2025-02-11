@@ -234,6 +234,7 @@ public:
 
     void displayCurrentScore()
     {
+        setColor(15);
         setCursorPosition(consoleWidth / 2 - 8, 0);
         cout << "Current Score: " << score << endl;
         cout.flush();
@@ -378,6 +379,7 @@ int main()
             board->draw();
             Sleep(board->getSnakeSpeed());
         }
+        setColor(15); // Set color to white
         if (board->getIsGameWon())
         {
             cout << endl << "                            Game Won" << endl;
