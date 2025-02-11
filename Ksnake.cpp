@@ -174,11 +174,11 @@ public:
 	        }
 	        else if (difficultyLevel == 2)
 	        {
-	            snakeSpeed = 70; // Normal: 75 milliseconds
+	            snakeSpeed = 75; // Normal: 75 milliseconds
 	        }
 	        else if (difficultyLevel == 3)
 	        {
-	            snakeSpeed = 35; // Hard: 50 milliseconds
+	            snakeSpeed = 25; // Hard: 50 milliseconds
 	        }
 	        else if (difficultyLevel == 4)
 	        {
