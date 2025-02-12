@@ -1,67 +1,61 @@
 # Snake Game
 
-This repository contains the implementation of a Snake game in C++. The game allows the user to play a classic Snake game with options for quick match and custom settings, including customization of the snake's head and body characters and colors, as well as the food character and color.
+## Description
+This is a terminal-based Snake game implemented in C++ using basic programming constructs. The game features both a Quick Match and a Custom mode, where players can customize the snake's appearance and difficulty level. The game dynamically updates the screen using Windows console functions.
 
-## Key Components
+## Features
+- **Single-player mode**: Control a snake to eat food and grow in length.
+- **Customizable gameplay**: Players can modify the snake's appearance, food appearance, and difficulty level.
+- **Dynamic difficulty levels**: Choose from Easy, Normal, Hard, and Legendary.
+- **Game-winning condition**: Reach a score of 50 to win the game.
+- **Game-over handling**: The game ends if the snake collides with itself or the wall.
+- **Quick Match mode**: Instantly start a game with default settings.
+- **Custom mode**: Personalize your snake and game settings.
 
-### Global Constants and Variables
-- `MAX_LENGTH`: Maximum length of the snake.
-- `DIR_UP`, `DIR_DOWN`, `DIR_LEFT`, `DIR_RIGHT`: Constants representing the directions the snake can move.
-- `consoleWidth`, `consoleHeight`: Variables to store the dimensions of the console window.
+## Controls
+- `W` or `Arrow Up`: Move Up
+- `A` or `Arrow Left`: Move Left
+- `S` or `Arrow Down`: Move Down
+- `D` or `Arrow Right`: Move Right
 
-### Functions
-- `initScreen()`: Initializes the console screen dimensions.
-- `displayMenu()`: Displays the main menu with options for Quick Match and Custom.
-- `displayCustomizationMenu()`: Prompts the user to enter custom characters and colors for the snake's head, body, and food.
+## Installation
+### Requirements
+- Windows OS (due to the use of Windows-specific console functions)
+- C++ Compiler (such as MinGW or MSVC)
 
-### Structs
-- `Point`: Represents a point on the console screen with `xCoord` and `yCoord`.
+### Steps to Compile and Run
+1. Clone the repository or download the source code.
+2. Open a terminal or command prompt in the project directory.
+3. Compile the program using a C++ compiler, for example:
+   ```sh
+   g++ -o snake_game snake_game.cpp -std=c++11
+   ```
+4. Run the executable:
+   ```sh
+   ./snake_game
+   ```
 
-### Classes
+## Customization
+In Custom mode, players can set:
+- **Snake Head Character**
+- **Snake Body Character**
+- **Food Character**
+- **Snake Head Color (0-15)**
+- **Snake Body Color (0-15)**
+- **Food Color (0-15)**
 
-#### Snake
-- **Attributes**:
-  - `length`: Length of the snake.
-  - `direction`: Current direction of the snake.
-  - `body[MAX_LENGTH]`: Array of `Point` representing the snake's body.
-- **Methods**:
-  - `Snake(int x, int y)`: Constructor to initialize the snake's starting position.
-  - `getLength()`: Returns the length of the snake.
-  - `changeDirection(char newDirection)`: Changes the direction of the snake.
-  - `move(Point food)`: Moves the snake and checks for collisions and food consumption.
+## Known Issues
+- The game is currently limited to Windows OS due to its reliance on `windows.h`.
+- The console resizing might affect the gameplay.
 
-#### Board
-- **Attributes**:
-  - `snake`: Pointer to a `Snake` object.
-  - `snakeHeadChar`, `snakeBodyChar`, `foodChar`: Characters representing the snake's head, body, and food.
-  - `snakeHeadColor`, `snakeBodyColor`, `foodColor`: Colors for the snake's head, body, and food.
-  - `food`: `Point` representing the food's position.
-  - `score`: Current score of the game.
-  - `snakeSpeed`: Speed of the snake based on difficulty level.
-  - `difficultyLevel`: Difficulty level of the game.
-  - `isGameWon`: Boolean indicating if the game is won.
-- **Methods**:
-  - `Board(bool isQuickMatch, char headChar, char bodyChar, char foodChar, int headCol, int bodyCol, int foodCol)`: Constructor to initialize the board with custom settings.
-  - `getSnakeSpeed()`: Returns the speed of the snake.
-  - `~Board()`: Destructor to clean up resources.
-  - `getScore()`: Returns the current score.
-  - `spawnFood()`: Spawns food at a random position on the board.
-  - `displayCurrentScore()`: Displays the current score on the console.
-  - `setCursorPosition(int x, int y)`: Sets the cursor position on the console.
-  - `draw()`: Draws the snake and food on the console.
-  - `update()`: Updates the game state, moves the snake, and checks for collisions and food consumption.
-  - `getInput()`: Gets user input for changing the snake's direction.
-  - `getIsGameWon()`: Returns whether the game is won.
+## Future Improvements
+- Implement support for Linux/macOS.
+- Add a multiplayer mode.
+- Enhance graphics with a better rendering technique.
 
-### Main Function
-- Initializes the game, displays the menu, and handles user input for game settings.
-- Creates a `Board` object with the chosen settings.
-- Runs the game loop, updating the game state, drawing the board, and handling user input.
-- Displays the game result (win or lose) and cleans up resources.
+## License
+This project is open-source and free to use. Feel free to contribute!
 
-## Usage
-1. Compile and run the program.
-2. Choose between Quick Match or Custom settings.
-3. If Custom is chosen, enter the desired characters and colors for the snake's head, body, and food.
-4. Play the game using the `W`, `A`, `S`, `D` keys to control the snake.
-5. The game ends when the snake collides with itself or the wall, or when the score reaches 50 (game won).
+## Author
+[Your Name]
+
