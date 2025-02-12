@@ -384,7 +384,6 @@ int main()
         }
         else
         {
-            auto clrscr();
             cout << endl << "                            Game Over" << endl;
         }
         delete board;

@@ -1,10 +1,9 @@
 #include <iostream>
 #include <conio.h>
-#include <stdexcept>
+// #include <stdexcept>
 #include <windows.h>
 #include <ctime>
 #include <limits>
-#include <mmsystem.h> // Include the header for PlaySound
 
 using namespace std;
 
@@ -115,7 +114,6 @@ public:
         {
             body[length] = Point(body[length - 1].xCoord, body[length - 1].yCoord);
             length++;
-            PlaySound(TEXT("eat.wav"), NULL, SND_FILENAME | SND_ASYNC); // Play sound when snake eats food
         }
 
         return true;
@@ -173,7 +171,7 @@ public:
                     {
                         cout << "Invalid input for difficulty level. Please try again." << endl;
                         cin.clear();
-                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cin.ignore(numeric_limits<streamsize>:: max(), '\n');
                     }
                     else
                     {
@@ -182,20 +180,25 @@ public:
                 }
 
                 // Set snake speed based on difficulty level
-                switch (difficultyLevel)
+                if (difficultyLevel == 1)
                 {
-                    case 1: // Easy
-                        snakeSpeed = 100; // 100 milliseconds
-                        break;
-                    case 2: // Normal
-                        snakeSpeed = 75; // 75 milliseconds
-                        break;
-                    case 3: // Hard
-                        snakeSpeed = 50; // 50 milliseconds
-                        break;
-                    case 4: // Legendary
-                        snakeSpeed = 25; // 25 milliseconds
-                        break;
+                    snakeSpeed = 100; // Easy: 100 milliseconds
+                }
+                else if (difficultyLevel == 2)
+                {
+                    snakeSpeed = 75; // Normal: 75 milliseconds
+                }
+                else if (difficultyLevel == 3)
+                {
+                    snakeSpeed = 25; // Hard: 50 milliseconds
+                }
+                else if (difficultyLevel == 4)
+                {
+                    snakeSpeed = 0; // Legendary: 25 milliseconds
+                }
+                else
+                {
+                    throw runtime_error("Error: Invalid difficulty level.");
                 }
             }
         }
@@ -272,7 +275,6 @@ public:
         bool isAlive = snake->move(food);
         if (isAlive == false || snake->body[0].xCoord >= consoleWidth - 1 || snake->body[0].yCoord >= consoleHeight - 1 || snake->body[0].xCoord < 0 || snake->body[0].yCoord < 0)
         {
-            PlaySound(TEXT("gameover.wav"), NULL, SND_FILENAME | SND_ASYNC); // Play sound when game is over
             return false;
         }
 
@@ -286,7 +288,6 @@ public:
         if (score >= 50)
         {
             isGameWon = true;
-            PlaySound(TEXT("win.wav"), NULL, SND_FILENAME | SND_ASYNC); // Play sound when game is won
             return false;
         }
         return true;
@@ -329,7 +330,7 @@ void displayMenu()
     cout << "Enter your choice: ";
 }
 
-void displayCustomizationMenu(char &snakeHeadChar, char &snakeBodyChar, char &foodChar, int &snakeHeadColor, int &snakeBodyColor, int &foodColor)
+void displayCustomizationMenu(char &snakeHeadChar, char &snakeBodyChar, char &foodChar )
 {
     cout << "Enter snake head character: ";
     cin >> snakeHeadChar;
@@ -337,41 +338,32 @@ void displayCustomizationMenu(char &snakeHeadChar, char &snakeBodyChar, char &fo
     cin >> snakeBodyChar;
     cout << "Enter food character: ";
     cin >> foodChar;
-
-    cout << "Choose snake head color (0-15): ";
-    cin >> snakeHeadColor;
-    cout << "Choose snake body color (0-15): ";
-    cin >> snakeBodyColor;
-    cout << "Choose food color (0-15): ";
-    cin >> foodColor;
 }
 
 int main()
 {
     srand(time(0));
-    try
+  //  try
     {
         initScreen();
-        char snakeHeadChar = 'O';
-        char snakeBodyChar = 'o';
-        char foodChar = '*';
-        int snakeHeadColor = 10; // Light green
-        int snakeBodyColor = 2; // Green
-        int foodColor = 12; // Red
-
         displayMenu();
         int choice;
         cin >> choice;
 
+        char snakeHeadChar = 'H';
+        char snakeBodyChar = '+';
+        char foodChar = 'O';
+        int snakeHeadColor = 2; // Green
+        int snakeBodyColor = 0; // Green
+        int foodColor = 1; // Red
+
         if (choice == 2)
         {
-            displayCustomizationMenu(snakeHeadChar, snakeBodyChar, foodChar, snakeHeadColor, snakeBodyColor, foodColor);
+            displayCustomizationMenu(snakeHeadChar, snakeBodyChar, foodChar );
         }
 
         bool isQuickMatch = (choice == 1);
         Board *board = new Board(isQuickMatch, snakeHeadChar, snakeBodyChar, foodChar, snakeHeadColor, snakeBodyColor, foodColor);
-
-        PlaySound(TEXT("start.wav"), NULL, SND_FILENAME | SND_ASYNC); // Play sound when game starts
 
         while (board->update())
         {
@@ -385,15 +377,14 @@ int main()
         }
         else
         {
-            auto clrscr();
             cout << endl << "                            Game Over" << endl;
         }
         delete board;
         return 0;
     }
-    catch (const exception &e)
-    {
-        cerr << "Exception: " << e.what() << endl;
-        return EXIT_FAILURE;
-    }
+    // catch (const exception &e)
+    // {
+    //     cerr << "Exception: " << e.what() << endl;
+    //     return EXIT_FAILURE;
+    // }
 }
