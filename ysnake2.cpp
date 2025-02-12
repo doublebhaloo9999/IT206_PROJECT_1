@@ -26,6 +26,12 @@ void initScreen()
     consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 }
 
+void customPause()
+{
+    cout << "Press any key to exit...";
+    _getch();
+}
+
 struct Point
 {
     int xCoord;
@@ -234,6 +240,7 @@ public:
 
     void displayCurrentScore()
     {
+        setColor(7); // White color for the current score
         setCursorPosition(consoleWidth / 2 - 8, 0);
         cout << "Current Score: " << score << endl;
         cout.flush();
@@ -369,6 +376,28 @@ public:
     {
         return isGameWon;
     }
+
+    void displayGameOver()
+    {
+        // Open a new terminal
+        system("start cmd /c \"title Game Over & color 07 & mode con: cols=80 lines=25\"");
+
+        // Calculate the position to center the game over message
+        int x = consoleWidth / 2 - 4;
+        int y = consoleHeight / 2;
+
+        // Display the game over message in the middle of the screen
+        setCursorPosition(x, y);
+        setColor(7); // White color for the game over message
+        cout << "Game Over" << endl;
+
+        // Display the current score below the game over message
+        setCursorPosition(x - 4, y + 1);
+        cout << "Current Score: " << score << endl;
+
+        // Pause to keep the terminal open
+        customPause();
+    }
 };
 
 void displayMenu()
@@ -401,9 +430,20 @@ int main()
     try
     {
         initScreen();
-        displayMenu();
         int choice;
-        cin >> choice;
+        while (true)
+        {
+            displayMenu();
+            cin >> choice;
+            if (choice == 1 || choice == 2)
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid choice. Please enter 1 for Quick Match or 2 for Custom." << endl;
+            }
+        }
 
         char snakeHeadChar = 'O';
         char snakeBodyChar = '*';
@@ -432,7 +472,7 @@ int main()
         }
         else
         {
-            cout << endl << "                            Game Over" << endl;
+            board->displayGameOver();
         }
         delete board;
         return 0;
