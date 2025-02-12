@@ -234,6 +234,7 @@ public:
 
     void displayCurrentScore()
     {
+        setColor(7); // White color for the current score
         setCursorPosition(consoleWidth / 2 - 8, 0);
         cout << "Current Score: " << score << endl;
         cout.flush();
@@ -250,23 +251,71 @@ public:
         }
     }
 
+    void drawFrame()
+    {
+        setColor(7); // White color for the frame
+        for (int x = 0; x < consoleWidth; x++)
+        {
+            setCursorPosition(x, 0);
+            cout << "#";
+            setCursorPosition(x, consoleHeight - 1);
+            cout << "#";
+        }
+        for (int y = 0; y < consoleHeight; y++)
+        {
+            setCursorPosition(0, y);
+            cout << "#";
+            setCursorPosition(consoleWidth - 1, y);
+            cout << "#";
+        }
+    }
+
     void draw()
     {
-        system("cls");
-        initScreen();
-        setColor(snakeHeadColor);
-        setCursorPosition(snake->body[0].xCoord, snake->body[0].yCoord);
-        cout << snakeHeadChar;
-        setColor(snakeBodyColor);
-        for (int i = 1; i < snake->getLength(); i++)
+        static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        static COORD bufferSize = { (SHORT)consoleWidth, (SHORT)consoleHeight };
+        static CHAR_INFO *buffer = new CHAR_INFO[consoleWidth * consoleHeight];
+        static SMALL_RECT writeRegion = { 0, 0, (SHORT)(consoleWidth - 1), (SHORT)(consoleHeight - 1) };
+
+        // Clear buffer
+        for (int i = 0; i < consoleWidth * consoleHeight; i++)
         {
-            setCursorPosition(snake->body[i].xCoord, snake->body[i].yCoord);
-            cout << snakeBodyChar;
+            buffer[i].Char.AsciiChar = ' ';
+            buffer[i].Attributes = 0;
         }
 
-        setColor(foodColor);
-        setCursorPosition(food.xCoord, food.yCoord);
-        cout << foodChar;
+        // Draw frame
+        for (int x = 0; x < consoleWidth; x++)
+        {
+            buffer[x].Char.AsciiChar = '#';
+            buffer[x].Attributes = 7;
+            buffer[x + (consoleHeight - 1) * consoleWidth].Char.AsciiChar = '#';
+            buffer[x + (consoleHeight - 1) * consoleWidth].Attributes = 7;
+        }
+        for (int y = 0; y < consoleHeight; y++)
+        {
+            buffer[y * consoleWidth].Char.AsciiChar = '#';
+            buffer[y * consoleWidth].Attributes = 7;
+            buffer[(consoleWidth - 1) + y * consoleWidth].Char.AsciiChar = '#';
+            buffer[(consoleWidth - 1) + y * consoleWidth].Attributes = 7;
+        }
+
+        // Draw snake
+        buffer[snake->body[0].yCoord * consoleWidth + snake->body[0].xCoord].Char.AsciiChar = snakeHeadChar;
+        buffer[snake->body[0].yCoord * consoleWidth + snake->body[0].xCoord].Attributes = snakeHeadColor;
+        for (int i = 1; i < snake->getLength(); i++)
+        {
+            buffer[snake->body[i].yCoord * consoleWidth + snake->body[i].xCoord].Char.AsciiChar = snakeBodyChar;
+            buffer[snake->body[i].yCoord * consoleWidth + snake->body[i].xCoord].Attributes = snakeBodyColor;
+        }
+
+        // Draw food
+        buffer[food.yCoord * consoleWidth + food.xCoord].Char.AsciiChar = foodChar;
+        buffer[food.yCoord * consoleWidth + food.xCoord].Attributes = foodColor;
+
+        // Write buffer to console
+        WriteConsoleOutput(hConsole, buffer, bufferSize, { 0, 0 }, &writeRegion);
+
         displayCurrentScore();
     }
 
@@ -321,6 +370,25 @@ public:
     {
         return isGameWon;
     }
+
+    void displayGameOver()
+    {
+        // Open a new terminal
+        system("start cmd /c \"title Game Over & color 07 & mode con: cols=80 lines=25\"");
+
+        // Calculate the position to center the game over message
+        int x = consoleWidth / 2 - 4;
+        int y = consoleHeight / 2;
+
+        // Display the game over message in the middle of the screen
+        setCursorPosition(x, y);
+        setColor(7); // White color for the game over message
+        cout << "Game Over" << endl;
+
+        // Display the current score below the game over message
+        setCursorPosition(x - 4, y + 1);
+        cout << "Current Score: " << score << endl;
+    }
 };
 
 void displayMenu()
@@ -353,9 +421,20 @@ int main()
     try
     {
         initScreen();
-        displayMenu();
         int choice;
-        cin >> choice;
+        while (true)
+        {
+            displayMenu();
+            cin >> choice;
+            if (choice == 1 || choice == 2)
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid choice. Please enter 1 for Quick Match or 2 for Custom." << endl;
+            }
+        }
 
         char snakeHeadChar = 'O';
         char snakeBodyChar = '*';
@@ -384,7 +463,7 @@ int main()
         }
         else
         {
-            cout << endl << "                            Game Over" << endl;
+            board->displayGameOver();
         }
         delete board;
         return 0;
