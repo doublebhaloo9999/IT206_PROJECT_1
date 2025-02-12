@@ -53,9 +53,3 @@ In Custom mode, players can set:
 - Add a multiplayer mode.
 - Enhance graphics with a better rendering technique.
 
-## License
-This project is open-source and free to use. Feel free to contribute!
-
-## Author
-[Your Name]
-
