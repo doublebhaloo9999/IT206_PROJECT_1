@@ -320,12 +320,34 @@ public:
     }
 
     bool update()
-    {
+    {   
+        // non infinite
         bool isAlive = snake->move(food);
         if (isAlive == false || snake->body[0].xCoord >= consoleWidth - 1 || snake->body[0].yCoord >= consoleHeight - 1 || snake->body[0].xCoord < 0 || snake->body[0].yCoord < 0)
         {
             return false;
         }
+    // infinite snake
+    //     if (isAlive)
+    // {
+    //     if (snake->body[0].xCoord >= consoleWidth - 1) // Hits right wall
+    //     {
+    //         snake->body[0].xCoord = 1; // Appear on left
+    //     }
+    //     else if (snake->body[0].xCoord < 1) // Hits left wall
+    //     {
+    //         snake->body[0].xCoord = consoleWidth - 2; // Appear on right
+    //     }
+
+    //     if (snake->body[0].yCoord >= consoleHeight - 1) // Hits bottom wall
+    //     {
+    //         snake->body[0].yCoord = 1; // Appear on top
+    //     }
+    //     else if (snake->body[0].yCoord < 1) // Hits top wall
+    //     {
+    //         snake->body[0].yCoord = consoleHeight - 2; // Appear on bottom
+    //     }
+    // }
 
         if (food.xCoord == snake->body[0].xCoord && food.yCoord == snake->body[0].yCoord)
         {
