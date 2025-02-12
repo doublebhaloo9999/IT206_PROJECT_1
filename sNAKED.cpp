@@ -388,6 +388,7 @@ public:
         // Display the current score below the game over message
         setCursorPosition(x - 4, y + 1);
         cout << "Current Score: " << score << endl;
+        _getch();
     }
 };
 
