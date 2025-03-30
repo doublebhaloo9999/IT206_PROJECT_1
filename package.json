@@ -1,0 +1,12 @@
+{
+  "name": "cpp-vercel-wrapper",
+  "version": "1.0.0",
+  "description": "A Node.js wrapper for the C++ Snake game.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
